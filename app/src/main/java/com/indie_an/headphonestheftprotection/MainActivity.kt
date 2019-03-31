@@ -4,10 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,8 +31,18 @@ class MainActivity : AppCompatActivity() {
                 if(intent != null && intent.action == Intent.ACTION_HEADSET_PLUG) {
                     val state: Int = intent.getIntExtra("state", -1)
 
-                    mp = MediaPlayer.create(context, R.raw.avast_virus_alert)
+                    mp = MediaPlayer()
+                    mp!!.setAudioStreamType(AudioManager.STREAM_ALARM)
                     mp!!.isLooping = true
+
+                    try {
+                        mp!!.setDataSource(context, Uri.parse(
+                            "android.resource://com.indie_an.headphonestheftprotection/"
+                                    + R.raw.avast_virus_alert))
+                        mp!!.prepare()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
 
                     when(state) {
                         0 -> {
